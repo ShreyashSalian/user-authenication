@@ -32,7 +32,7 @@ export const userActivation = (): void => {
         await sendActivationMail(user.email, user.fullName);
         console.log(`Activation email sent to ${user.email}`);
       }
-      if (users.length >= 0) {
+      if (users.length > 0) {
         console.log(`Total users activated: ${users.length}`);
       }
     } catch (err: any) {
