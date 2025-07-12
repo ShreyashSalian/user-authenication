@@ -1,13 +1,30 @@
 import request from "supertest";
 import app from "../app";
-import { User } from "../models/user.model";
-import { Login } from "../models/login.model";
-import { registrationMail } from "../utils/sendEmail";
-import { mockUser } from "../models/__mocks__/user.model";
 
-jest.mock("../models/user.model");
-jest.mock("../models/login.model");
-jest.mock("../utils/sendEmail");
+import { Login } from "../__mocks__/login.model";
+import { registrationMail } from "../__mocks__/sendEmail";
+import { mockUser, User } from "../__mocks__/user.model";
+
+// jest.mock("../models/user.model", () => ({
+//   ...jest.requireActual("../../__mocks__/user.model"),
+//   __esModule: true,
+// }));
+
+// jest.mock("../models/login.model", () => ({
+//   ...jest.requireActual("../../__mocks__/login.model"),
+//   __esModule: true,
+// }));
+
+// jest.mock("../utils/sendEmail", () => ({
+//   ...jest.requireActual("../../__mocks__/sendEmail"),
+//   __esModule: true,
+// }));
+
+jest.setTimeout(10000);
+
+afterAll(() => {
+  jest.clearAllMocks();
+});
 
 describe("Register & Login APIs", () => {
   describe("User Registration", () => {

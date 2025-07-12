@@ -86,8 +86,8 @@ export const loginUser = asyncHandler(
       return sendError(
         res,
         CONSTANT_LIST.STATUS_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR_MESSAGE
+        500,
+        "Internal server error"
       );
     }
   }
