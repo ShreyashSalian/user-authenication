@@ -5,24 +5,24 @@ import { Login } from "../__mocks__/login.model";
 import { registrationMail } from "../__mocks__/sendEmail";
 import { mockUser, User } from "../__mocks__/user.model";
 
-// jest.mock("../models/user.model", () => ({
-//   ...jest.requireActual("../../__mocks__/user.model"),
-//   __esModule: true,
-// }));
+jest.mock("../models/user.model", () => ({
+  User: require("../__mocks__/user.model").User,
+  __esModule: true,
+}));
 
-// jest.mock("../models/login.model", () => ({
-//   ...jest.requireActual("../../__mocks__/login.model"),
-//   __esModule: true,
-// }));
+jest.mock("../models/login.model", () => ({
+  Login: require("../__mocks__/login.model").Login,
+  __esModule: true,
+}));
 
-// jest.mock("../utils/sendEmail", () => ({
-//   ...jest.requireActual("../../__mocks__/sendEmail"),
-//   __esModule: true,
-// }));
+jest.mock("../utils/sendEmail", () => ({
+  registrationMail: require("../__mocks__/sendEmail").registrationMail,
+  __esModule: true,
+}));
 
 jest.setTimeout(10000);
 
-afterAll(() => {
+afterEach(() => {
   jest.clearAllMocks();
 });
 
@@ -74,7 +74,7 @@ describe("Register & Login APIs", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.accessToken).toBe("fake-token");
+      expect(res.body.data.accessToken).toBe("fake-access-token");
     });
 
     it("should fail login with incorrect password", async () => {

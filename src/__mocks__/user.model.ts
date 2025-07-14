@@ -1,24 +1,19 @@
-// __mocks__/user.model.ts
-
 export const mockUser = {
   _id: "user123",
-  userName: "samrat123",
-  fullName: "Samrat KK",
   email: "samrat@example.com",
-  contactNumber: "1234567890",
-  gender: "male",
-  status: "inactive",
-  role: "user",
+  userName: "samrat123",
+  password: "user@123",
   isDeleted: false,
   comparePassword: jest.fn().mockResolvedValue(true),
-  generateAccessToken: jest.fn(() => "fake-token"),
-  generateRefreshToken: jest.fn(() => "fake-refresh-token"),
+  generateAccessToken: jest.fn().mockReturnValue("fake-access-token"),
+  generateRefreshToken: jest.fn().mockReturnValue("fake-refresh-token"),
 };
 
 export const User = {
   findOne: jest.fn(),
   create: jest.fn(),
-  findById: jest.fn().mockReturnValue({
+  findById: jest.fn().mockImplementation(() => ({
+    ...mockUser, // Direct return from findById has methods too
     select: jest.fn().mockResolvedValue(mockUser),
-  }),
+  })),
 };

@@ -19,22 +19,6 @@ export function asyncHandler<
   ) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
-export const successFunction = (
-  res: express.Response,
-  status: number,
-  statusCode: number,
-  message: string,
-  data: any
-) => {
-  return res.status(statusCode).json({
-    status,
-    statusCode,
-    data,
-    successMessage: message,
-    errorMessage: null,
-  });
-};
-
 export const sendSuccess = (
   res: express.Response,
   status: number,
@@ -48,21 +32,6 @@ export const sendSuccess = (
     data,
     successMessage: message,
     errorMessage: null,
-  });
-};
-
-export const errorFunction = (
-  res: express.Response,
-  status: number,
-  statusCode: number,
-  errorMessage: string
-) => {
-  return res.status(statusCode).json({
-    status,
-    statusCode,
-    data: null,
-    successMessage: null,
-    errorMessage,
   });
 };
 
