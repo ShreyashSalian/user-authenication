@@ -7,10 +7,10 @@ export const connectDB = async (): Promise<void> => {
   try {
     const DB =
       process.env.NODE_ENV === "production"
-        ? `${process.env.LOCAL_PATH}/${process.env.DATABASE_NAME}` //FOR local database
-        : `${process.env.LIVE_PATH}/${process.env.DATABASE_NAME}`; // for live database
+        ? `${process.env.LOCAL_PATH}/${process.env.DATABASE_NAME}` // To connect to local server mongod compass
+        : `${process.env.LIVE_PATH}/${process.env.DATABASE_NAME}`; // for connect to mongod atlas
     const connection = await mongoose.connect(
-      // `${process.env.DOCKER_PATH}/${process.env.DATABASE_NAME}` //For docker
+      // `${process.env.DOCKER_PATH}/${process.env.DATABASE_NAME}` //To run using the docker
       DB
     );
     console.log(`Connected to the Database : ${connection.connection.host}`);
