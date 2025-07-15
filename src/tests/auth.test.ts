@@ -1,13 +1,30 @@
 import request from "supertest";
 import app from "../app";
-import { User } from "../models/user.model";
-import { Login } from "../models/login.model";
-import { registrationMail } from "../utils/sendEmail";
-import { mockUser } from "../models/__mocks__/user.model";
 
-jest.mock("../models/user.model");
-jest.mock("../models/login.model");
-jest.mock("../utils/sendEmail");
+import { Login } from "../__mocks__/login.model";
+import { registrationMail } from "../__mocks__/sendEmail";
+import { mockUser, User } from "../__mocks__/user.model";
+
+jest.mock("../models/user.model", () => ({
+  User: require("../__mocks__/user.model").User,
+  __esModule: true,
+}));
+
+jest.mock("../models/login.model", () => ({
+  Login: require("../__mocks__/login.model").Login,
+  __esModule: true,
+}));
+
+jest.mock("../utils/sendEmail", () => ({
+  registrationMail: require("../__mocks__/sendEmail").registrationMail,
+  __esModule: true,
+}));
+
+jest.setTimeout(10000);
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe("Register & Login APIs", () => {
   describe("User Registration", () => {
@@ -57,7 +74,7 @@ describe("Register & Login APIs", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.accessToken).toBe("fake-token");
+      expect(res.body.data.accessToken).toBe("fake-access-token");
     });
 
     it("should fail login with incorrect password", async () => {

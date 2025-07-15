@@ -3,8 +3,6 @@ import { asyncHandler, sendError, sendSuccess } from "../utils/function";
 import { User } from "../models/user.model";
 import { Login } from "../models/login.model";
 import { LoginBody } from "../helpers/user.helper";
-import { CONSTANT_LIST } from "../constants/global-constant";
-import { USER_MESSAGE_LIST } from "../controller-messages/user.message";
 
 const generateAccessAndRefreshToken = async (
   userId: string
@@ -25,70 +23,50 @@ export const loginUser = asyncHandler(
   ): Promise<express.Response> => {
     try {
       const { userNameOrEmail, password } = req.body;
+
       const checkUserExist = await User.findOne({
         $or: [
-          {
-            email: { $regex: userNameOrEmail, $options: "i" },
-          },
-          {
-            userName: userNameOrEmail,
-          },
+          { email: { $regex: userNameOrEmail, $options: "i" } },
+          { userName: userNameOrEmail },
         ],
       });
+
       if (!checkUserExist) {
-        return sendError(
-          res,
-          CONSTANT_LIST.STATUS_ERROR,
-          CONSTANT_LIST.NO_USER_FOUND,
-          USER_MESSAGE_LIST.NO_USER_FOUND_WITH_EMAIL_OR_USERNAME
-        );
+        return sendError(res, 0, 404, "User not found");
       }
+
       if (checkUserExist.isDeleted) {
-        return sendError(
-          res,
-          CONSTANT_LIST.STATUS_ERROR,
-          CONSTANT_LIST.BAD_REQUEST,
-          USER_MESSAGE_LIST.ACCOUNT_DISABLED
-        );
+        return sendError(res, 0, 400, "Account is disabled");
       }
+
       const passwordCheck = await checkUserExist.comparePassword(password);
       if (!passwordCheck) {
-        return sendError(
-          res,
-          CONSTANT_LIST.STATUS_ERROR,
-          CONSTANT_LIST.BAD_REQUEST,
-          USER_MESSAGE_LIST.ENTER_VALID_PASSWORD
-        );
+        return sendError(res, 0, 400, "Invalid password");
       }
+
       const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-        checkUserExist?._id
+        checkUserExist._id
       );
 
       await Login.create({
-        userId: checkUserExist?._id,
-        email: checkUserExist?.email,
+        userId: checkUserExist._id,
+        email: checkUserExist.email,
         accessToken,
         refreshToken,
       });
 
-      const loginUser = await User.findById(checkUserExist?._id).select(
+      const loginUser = await User.findById(checkUserExist._id).select(
         "-password"
       );
-      return sendSuccess(
-        res,
-        CONSTANT_LIST.STATUS_SUCCESS,
-        CONSTANT_LIST.STATUS_CODE_OK,
-        USER_MESSAGE_LIST.LOGIN_USER_DETAIL,
-        { loginUser, accessToken, refreshToken }
-      );
-    } catch (err: any) {
+
+      return sendSuccess(res, 1, 200, "User logged in successfully", {
+        loginUser,
+        accessToken,
+        refreshToken,
+      });
+    } catch (err) {
       console.log(err);
-      return sendError(
-        res,
-        CONSTANT_LIST.STATUS_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR_MESSAGE
-      );
+      return sendError(res, 0, 500, "Internal server error");
     }
   }
 );
@@ -101,40 +79,19 @@ export const logoutUser = asyncHandler(
     try {
       const user = req.user?.userId;
       if (!user) {
-        return sendError(
-          res,
-          CONSTANT_LIST.STATUS_ERROR,
-          CONSTANT_LIST.NO_USER_FOUND,
-          USER_MESSAGE_LIST.NO_USER_FOUND_WITH_EMAIL_OR_USERNAME
-        );
+        return sendError(res, 0, 404, "User not found");
       }
-      const deleteUserFromLogin = await Login.findOneAndDelete({
-        userId: user,
-      });
-      if (deleteUserFromLogin) {
-        return sendSuccess(
-          res,
-          CONSTANT_LIST.STATUS_SUCCESS,
-          CONSTANT_LIST.STATUS_CODE_OK,
-          USER_MESSAGE_LIST.USER_LOGOUT_SUCESSFULLY,
-          {}
-        );
+
+      const deleted = await Login.findOneAndDelete({ userId: user });
+
+      if (deleted) {
+        return sendSuccess(res, 1, 200, "User logged out successfully", {});
       } else {
-        return sendError(
-          res,
-          CONSTANT_LIST.STATUS_ERROR,
-          CONSTANT_LIST.BAD_REQUEST,
-          USER_MESSAGE_LIST.USER_LOGOUT_FAIL
-        );
+        return sendError(res, 0, 400, "Logout failed");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.log(err);
-      return sendError(
-        res,
-        CONSTANT_LIST.STATUS_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR,
-        CONSTANT_LIST.INTERNAL_SERVER_ERROR_MESSAGE
-      );
+      return sendError(res, 0, 500, "Internal server error");
     }
   }
 );
