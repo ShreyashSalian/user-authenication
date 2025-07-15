@@ -6,7 +6,7 @@ AddUserFromList;
 export const connectDB = async (): Promise<void> => {
   try {
     const DB =
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === "production"
         ? `${process.env.LOCAL_PATH}/${process.env.DATABASE_NAME}` //FOR local database
         : `${process.env.LIVE_PATH}/${process.env.DATABASE_NAME}`; // for live database
     const connection = await mongoose.connect(
